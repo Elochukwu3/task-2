@@ -44,7 +44,8 @@ Organisation Model:
      "description": "string",
  }
 Endpoints:
- [POST] /auth/register Registers a users and creates a default organisation Register request body:
+ [POST] /auth/register Registers a users and creates a default organisation 
+ Register request body:
  {
      "firstName": "string",
      "lastName": "string",
