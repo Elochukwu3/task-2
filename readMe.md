@@ -30,9 +30,9 @@ Acceptance Criteria
  User Login
  Implement an endpoint for user Login.
  Use the JWT token returned to access PROTECTED endpoints.
-Organisation
+Organisationor m
  A user can belong to one or more organisations
- An organisation can contain one or more users.
+ An organisation can contain one ore users.
  On every registration, an organisation must be created.
  The name property of the organisation takes the user’s firstName and appends “Organisation” to it. For example: user’s first name is John , organisation name becomes "John's Organisation" because firstName = "John" .
  Logged in users can access organisations they belong to and organisations they created.
