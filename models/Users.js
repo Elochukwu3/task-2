@@ -13,7 +13,7 @@ const User = new Schema({
 });
 User.methods.accessToken = function () {
     return JWT.sign({
-        userId: User.UserId, email: User.email ,
+        userId:this.userId, email:this.email ,
       }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "1h"});
   };
 

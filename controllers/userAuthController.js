@@ -94,8 +94,7 @@ async function userLogin(req, res)  {
         });
     } catch (error) {
 
-      
-        res.status(400).send({ status: 'Bad request', message: 'Authentication failed', statusCode: 401 });
+    res.status(400).send({ status: 'Bad request', message: 'Authentication failed', statusCode: 401 });
     }
 }
 
