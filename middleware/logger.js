@@ -1,33 +1,28 @@
 const fsPromise = require("fs").promises;
 const fs = require("fs");
-
-const {v4: uuid} = require("uuid");
-const {format} = require("date-fns");
+const { v4: uuid } = require("uuid");
+const { format } = require("date-fns");
 const path = require("path");
 
+const logError = async (error, file = "stderr", ext = ".log") => {
+    const dateTime = format(new Date(), "yyyyMMdd/HH:mm:ss");
+    const logMessage = `${uuid()} \t ${dateTime} \t ${error.message || error}\n`;
 
-const logEvent = async(message = "hii", file,ext='.txt')=>{
-
-    const dateTime = format(new Date(), "yyyyMMdd/tHH:mm:ss");
-    const logTime = `${uuid()} \t ${dateTime} ${message}\t`;
     try {
-        if(!fs.existsSync(path.join(__dirname,'..', 'log'))){
-            await fsPromise.mkdir(path.join(__dirname,'..', 'log'))
+        const logDir = path.join(__dirname, '..', 'log');
+        if (!fs.existsSync(logDir)) {
+            await fsPromise.mkdir(logDir);
         }
-      await fsPromise.appendFile(path.join(__dirname,'..', "log", `${file}${ext}`), logTime)
-    } catch (error) {
-        console.log(error)
+        await fsPromise.appendFile(path.join(logDir, `${file}${ext}`), logMessage);
+    } catch (err) {
+        console.error("Failed to log error:", err);
     }
-    
-}
+};
 
-const logger = ((req, res, next) => {
-    logEvent(
-      `${req.method}\t ${req.path} ${req.headers.origin}`,
-      "stderr"
-    );
-  
-    next();
-  })
+// Middleware to log errors
+const errorLogger = (err, req, res, next) => {
+    logError(err);
+    next(err);
+};
 
-module.exports = {logger}
+module.exports = { errorLogger, logError };
