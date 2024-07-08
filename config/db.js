@@ -1,12 +1,9 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const connectDB = async ()=>{
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true,
-            useFindAndModify: false
+        await mongoose.connect('mongodb://localhost:27017/hng-task2', {
+            serverSelectionTimeoutMS: 5000  
         });
         console.log("MongoDB Connected...");
     } catch (error) {
@@ -22,4 +19,4 @@ mongoose.connection.on('connected', ()=>{
     console.log('Connected to MongoDB');
 })
 
-export default connectDB;
+module.exports = connectDB;
