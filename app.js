@@ -1,16 +1,23 @@
+require('express-async-errors');
+require('dotenv').config();
+
+const connectDB = require('./config/db')
 const express = require("express");
 const app = express();
 const cors = require('cors')
 const path = require('path')
 
 const PORT = process.env.PORT || 8000;
-const { logger } = require("./middleware/logger");
-const  corsConfig = require('./config/cors')
+const{ errorLogger} = require("./middleware/logger");
+const  corsConfig = require('./config/cors');
+const authRoute = require('./routes/auth')
 
 app.use(express.json());
-app.use(logger);
 app.use(cors(corsConfig));
+connectDB();    
+
 app.use(express.static(path.join(__dirname,'public')));
+app.use('/auth', authRoute);
 
 app.all('*', (req, res) => {
     if(req.accepts('html')){
@@ -23,5 +30,5 @@ app.all('*', (req, res) => {
         res.type('text').send('Not Acceptable');
     }
 })
-
+app.use(errorLogger);
 app.listen(PORT, () => console.log(`Listening to port: ${PORT}`));
