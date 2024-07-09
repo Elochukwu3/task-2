@@ -134,57 +134,67 @@ async function orgUsers(req, res) {
 }
 
 const getUserById = async (req, res) => {
-  const userId = req.params.id;
-  try {
-      const user = await User.findOne({userId});
-
+    const userId = req.params.id;
+    
+    // Check if req.user is populated
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    try {
+      const user = await User.findOne({ userId });
+  
       if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-      
-        const requestingUserId = req.user.userId;
-        console.log(requestingUserId, req.user);
-
-        if (user.userId === requestingUserId) {
-            return res.status(200).json({
-                status: 'success',
-                message: 'User details retrieved successfully',
-                data: {
-                    userId: user.userId,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    phone: user.phone
-                }
-            });
-        }
-
-      
-        const organisations = await Organisation.find({ users: requestingUserId });
-
-        const userInOrganisation = organisations.some(org => org.users.includes(user._id.toString()));
-
-        if (userInOrganisation) {
-
-            return res.status(200).json({
-                status: 'success',
-                message: 'User details successfully retrieved',
-                data: {
-                    userId: user.userId,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    phone: user.phone
-                }
-            });
-        }
-
-        return res.status(403).json({ message: 'Access denied' });
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).send("Server error");
-  }
-};
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const requestingUserId = req.user.userId;
+      console.log('Requesting User ID:', requestingUserId);
+      console.log('Requested User:', userId);
+  
+      // User accessing their own data
+      if (user.userId === requestingUserId) {
+        return res.status(200).json({
+          status: 'success',
+          message: 'User details retrieved successfully',
+          data: {
+            userId: user.userId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phone: user.phone
+          }
+        });
+      }
+  
+      // Check if the requesting user is part of any organisation the user belongs to
+      const organisations = await Organisation.find({ users: requestingUserId });
+      const userInOrganisation = organisations.some(org => org.users.includes(user._id.toString()));
+  
+      if (userInOrganisation) {
+        return res.status(200).json({
+          status: 'success',
+          message: 'User details successfully retrieved',
+          data: {
+            userId: user.userId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phone: user.phone
+          }
+        });
+      }
+  
+      return res.status(403).json({ message: 'Access denied' });
+  
+    } catch (error) {
+      console.error('Error in getUserById:', error.message);
+      return res.status(500).send("Server error");
+    }
+  };
+  
+  module.exports = getUserById;
+  
 
 
 module.exports = { getOrganisation, getOrgId, postOrg, orgUsers, getUserById };
