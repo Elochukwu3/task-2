@@ -1,205 +1,43 @@
- BACKEND Stage 2 Task: User Authentication & Organisation
-Using your most comfortable backend framework of your choice, adhere to the following acceptance:
-READ CAREFULLY!!!
-Acceptance Criteria
- Connect your application to a Postgres database server. (optional: you can choose to use any ORM of your choice if you want or not).
- Create a User model using the properties below
- NB: user id and email must be unique
- {
-     "userId": "string" // must be unique
-     "firstName": "string", // must not be null
-     "lastName": "string" // must not be null
-     "email": "string" // must be unique and must not be null
-     "password": "string" // must not be null
-     "phone": "string"
- }
- Provide validation for all fields. When there’s a validation error, return status code 422 with payload:
- {
-   "errors": [
-     {
-       "field": "string",
-       "message": "string"
-     },
-   ]
- }
- Using the schema above, implement user authentication
- User Registration:
- Implement an endpoint for user registration
- Hash the user’s password before storing them in the database.
- successful response: Return the payload with a 201 success status code.
- User Login
- Implement an endpoint for user Login.
- Use the JWT token returned to access PROTECTED endpoints.
-Organisationor m
- A user can belong to one or more organisations
- An organisation can contain one ore users.
- On every registration, an organisation must be created.
- The name property of the organisation takes the user’s firstName and appends “Organisation” to it. For example: user’s first name is John , organisation name becomes "John's Organisation" because firstName = "John" .
- Logged in users can access organisations they belong to and organisations they created.
- Create an organisation model with the properties below.
-Organisation Model:
- {
-     "orgId": "string", // Unique
-     "name": "string", // Required and cannot be null
-     "description": "string",
- }
-Endpoints:
- [POST] /auth/register Registers a users and creates a default organisation 
- Register request body:
- {
-     "firstName": "string",
-     "lastName": "string",
-     "email": "string",
-     "password": "string",
-     "phone": "string",
- }
-Successful response: Return the payload below with a 201 success status code.
- {
-     "status": "success",
-     "message": "Registration successful",
-     "data": {
-       "accessToken": "eyJh...",
-       "user": {
-           "userId": "string",
-           "firstName": "string",
-                 "lastName": "string",
-                 "email": "string",
-                 "phone": "string",
-       }
-     }
- }
-Unsuccessful registration response:
- {
-     "status": "Bad request",
-     "message": "Registration unsuccessful",
-     "statusCode": 400
- }
- [POST] /auth/login : logs in a user. When you log in, you can select an organisation to interact with
-Login request body:
- {
-     "email": "string",
-     "password": "string",
- }
-Successful response: Return the payload below with a 200 success status code.
- {
-     "status": "success",
-     "message": "Login successful",
-     "data": {
-       "accessToken": "eyJh...",
-       "user": {
-           "userId": "string",
-           "firstName": "string",
-                 "lastName": "string",
-                 "email": "string",
-                 "phone": "string",
-       }
-     }
- }
-Unsuccessful login response:
- {
-     "status": "Bad request",
-     "message": "Authentication failed",
-     "statusCode": 401
- }
- [GET] /api/users/:id : a user gets their own record or user record in organisations they belong to or created [PROTECTED].
-Successful response: Return the payload below with a 200 success status code.
- {
-         "status": "success",
-     "message": "<message>",
-     "data": {
-       "userId": "string",
-       "firstName": "string",
-             "lastName": "string",
-             "email": "string",
-             "phone": "string"
-     }
- }
- [GET] /api/organisations : gets all your organisations the user belongs to or created. If a user is logged in properly, they can get all their organisations. They should not get another user’s organisation [PROTECTED].
-Successful response: Return the payload below with a 200 success status code.
- {
-     "status": "success",
-         "message": "<message>",
-     "data": {
-       "organisations": [
-           {
-               "orgId": "string",
-                     "name": "string",
-                     "description": "string",
-           }
-       ]
-     }
- }
- [GET] /api/organisations/:orgId the logged in user gets a single organisation record [PROTECTED]
-Successful response: Return the payload below with a 200 success status code.
- {
-     "status": "success",
-         "message": "<message>",
-     "data": {
-             "orgId": "string", // Unique
-             "name": "string", // Required and cannot be null
-             "description": "string",
-     }
- }
- [POST] /api/organisations : a user can create their new organisation [PROTECTED].
-Request body: request body must be validated
- {
-     "name": "string", // Required and cannot be null
-     "description": "string",
- }
-Successful response: Return the payload below with a 201 success status code.
- {
-     "status": "success",
-     "message": "Organisation created successfully",
-     "data": {
-           "orgId": "string", 
-                 "name": "string", 
-                 "description": "string"
-     }
- }
-Unsuccessful response:
- {
-     "status": "Bad Request",
-     "message": "Client error",
-     "statusCode": 400
- }
- [POST] /api/organisations/:orgId/users : adds a user to a particular organisation
-Request body:
- {
-     "userId": "string"
- }
-Successful response: Return the payload below with a 200 success status code.
- {
-     "status": "success",
-     "message": "User added to organisation successfully",
- }
-Unit Testing
-Write appropriate unit tests to cover
- Token generation - Ensure token expires at the correct time and correct user details is found in token.
- Organisation - Ensure users can’t see data from organisations they don’t have access to.
-End-to-End Test Requirements for the Register Endpoint
-The goal is to ensure the POST /auth/register endpoint works correctly by performing end-to-end tests. The tests should cover successful user registration, validation errors, and database constraints.
-Directory Structure:
- The test file should be named auth.spec.ext (ext is the file extension of your chosen language) inside a folder named tests . For example tests/auth.spec.ts assuming I’m using Typescript
-Test Scenarios:
- It Should Register User Successfully with Default Organisation:Ensure a user is registered successfully when no organisation details are provided.
- Verify the default organisation name is correctly generated (e.g., "John's Organisation" for a user with the first name "John").
- Check that the response contains the expected user details and access token.
- It Should Log the user in successfully:Ensure a user is logged in successfully when a valid credential is provided and fails otherwise.
- Check that the response contains the expected user details and access token.
- It Should Fail If Required Fields Are Missing:Test cases for each required field (firstName, lastName, email, password) missing.
- Verify the response contains a status code of 422 and appropriate error messages.
- It Should Fail if there’s Duplicate Email or UserID:Attempt to register two users with the same email.
- Verify the response contains a status code of 422 and appropriate error messages.
-How to submit
- Host your API on a free hosting service as you did with stage 1.
- Only submit the endpoint’s base URL. E.g https://example.com
- A Google form would be provided for submission
-Submission Deadline:
-The deadline for submissions is Sunday 7th July, 2024 at 11:59 PM GMT. Late submissions will not be entertained.
-Submission Mode:
-Submit your task through the designated submission form. Ensure you've:
- Hosted the page on a platform of your choice.
- Double-checked all requirements and acceptance criteria.
- Provided the hosted page's URL in the submission form.
- Thoroughly review your work to ensure accuracy, functionality, and adherence to the specified guidelines before you submit it.
+# BACKEND Stage 2 Task: User Authentication & Organisation
 
+## Introduction
+This project is aimed at building a backend application for user authentication and organisation management using Express.js and MongoDB.
+
+## Acceptance Criteria
+1. **Database Connection**:
+   - Connect to a MongoDB database.
+
+2. **User Model**:
+   - Properties: `userId`, `firstName`, `lastName`, `email`, `password`, `phone`.
+   - Ensure `userId` and `email` are unique.
+   - Provide validation for all fields.
+
+3. **Validation**:
+   - Return status code 422 for validation errors with detailed error messages.
+
+4. **User Authentication**:
+   - **Registration**:
+     - Endpoint: `[POST] /auth/register`
+     - Hash passwords before storing.
+     - Return access token and user details on successful registration.
+   - **Login**:
+     - Endpoint: `[POST] /auth/login`
+     - Return access token and user details on successful login.
+
+5. **Organisation Model**:
+   - Properties: `orgId`, `name`, `description`.
+   - A user can belong to multiple organisations.
+   - Create a default organisation for each new user.
+
+6. **Endpoints**:
+   - **User Endpoints**:
+     - `[POST] /auth/register`: Register a user and create a default organisation.
+     - `[POST] /auth/login`: Log in a user.
+     - `[GET] /api/users/:id`: Retrieve user details.
+   - **Organisation Endpoints**:
+     - `[GET] /api/organisations`: Get all organisations the user belongs to.
+     - `[GET] /api/organisations/:orgId`: Get details of a single organisation.
+     - `[POST] /api/organisations`: Create a new organisation.
+     - `[POST] /api/organisations/:orgId/users`: Add a user to an organisation.
+
+7
