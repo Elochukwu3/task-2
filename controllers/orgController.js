@@ -5,11 +5,18 @@ const User = require("../models/Users");
 async function getOrganisation(req, res) {
   try {
     const organisations = await Organisation.find({ users: req.user.userId });
-    res.status(200).send({
-      status: "success",
-      message: "Organisations fetched successfully",
-      data: { organisations },
-    });
+    
+    const formattedOrganisations = organisations.map(org => ({
+        orgId: org?.orgId,
+        name: org?.name,
+        description: org?.description
+      }));
+  
+      res.status(200).send({
+        status: "success",
+        message: "Organisations fetched successfully",
+        data: { organisations: formattedOrganisations },
+      });
   } catch (error) {
     res
       .status(400)
@@ -149,8 +156,7 @@ const getUserById = async (req, res) => {
       }
   
       const requestingUserId = req.user.userId;
-      console.log('Requesting User ID:', requestingUserId);
-      console.log('Requested User:', userId);
+     
   
       // User accessing their own data
       if (user.userId === requestingUserId) {
@@ -193,8 +199,6 @@ const getUserById = async (req, res) => {
     }
   };
   
-  module.exports = getUserById;
-  
-
+ 
 
 module.exports = { getOrganisation, getOrgId, postOrg, orgUsers, getUserById };

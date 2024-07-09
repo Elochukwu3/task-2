@@ -45,7 +45,7 @@ async function userRegister(req, res) {
     await Organisation.create({
       orgId: new mongoose.Types.ObjectId(),
       name: `${firstName}'s Organisation`,
-      users: [newUser._id],
+      users: [newUser.userId],
     });
 
     const token = newUser.accessToken();
