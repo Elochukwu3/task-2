@@ -1,5 +1,13 @@
 const request = require('supertest');
+const mongoose = require("mongoose");
 const app = require('../app');
+// const { describe, it } = require("node:test");
+
+afterAll(async () => {
+    await mongoose.connection.close(); // Close mongoose connection
+    await server.close(); // Close the server instance
+  });
+  
 
 describe('User Registration and Login', () => {
     it('Should register user successfully with default organisation', async () => {
@@ -8,7 +16,7 @@ describe('User Registration and Login', () => {
             .send({
                 firstName: 'John',
                 lastName: 'Doe',
-                email: 'john@example.com',
+                email: 'jhn@example.com',
                 password: 'password123',
                 phone: '1234567890'
             });
@@ -21,12 +29,12 @@ describe('User Registration and Login', () => {
         const res = await request(app)
             .post('/auth/login')
             .send({
-                email: 'john@example.com',
+                email: 'jhn@example.com',
                 password: 'password123'
             });
         expect(res.statusCode).toEqual(200);
         expect(res.body.status).toEqual('success');
-        expect(res.body.data.user.email).toEqual('john@example.com');
+        expect(res.body.data.user.email).toEqual('jhn@example.com');
     });
 
     it('Should fail if required fields are missing', async () => {
@@ -48,7 +56,7 @@ describe('User Registration and Login', () => {
             .send({
                 firstName: 'John',
                 lastName: 'Doe',
-                email: 'john@example.com',
+                email: 'jhn@example.com',
                 password: 'password123',
                 phone: '1234567890'
             });

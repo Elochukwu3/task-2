@@ -40,4 +40,4 @@ This project is aimed at building a backend application for user authentication 
      - `[POST] /api/organisations`: Create a new organisation.
      - `[POST] /api/organisations/:orgId/users`: Add a user to an organisation.
 
-7
+

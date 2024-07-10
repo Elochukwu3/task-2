@@ -13,10 +13,10 @@ const connectDB = async ()=>{
 }
 
 mongoose.connection.on('error', ()=>{
-console.log('Error connecting to MongoDB');
+// console.log('Error connecting to MongoDB');
 })
 mongoose.connection.on('connected', ()=>{
-    console.log('Connected to MongoDB');
+    // console.log('Connected to MongoDB');
 })
 
 module.exports = connectDB;
